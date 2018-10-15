@@ -94,8 +94,10 @@ namespace PullToScxtpt.Service
                         //必填项 
                         //是否默认简历（0：默认，1：非默认）
                         acc203 = "0",
+                        //登记日期
                         aae043 = item["UpdateTime"].ToString(),
                         yae100 = "广元人才中心",
+                        //登记时间
                         aae036 = item["UpdateTime"].ToString(),
                         aae017 = "广元人才中心",
                         aae011 = "广元市",

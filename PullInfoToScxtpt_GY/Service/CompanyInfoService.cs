@@ -95,6 +95,7 @@ namespace PullToScxtpt
                         aae011 = "广元市",
                       //  yae100 = "攀枝花市人才中心"
                     };
+                    //单位类型
                     var aab019 = codeMappers.Where(c => item["icnItemCode"].ToString().ToUpper().
                     Equals(c.localCodeValue)).Where(c => c.codeType.Equals("AAB019")).FirstOrDefault();
                     if (aab019==null)
@@ -106,7 +107,7 @@ namespace PullToScxtpt
                     {
                         companyInfo.aab019 = aab019.codeValue.ToString();
                     }
-
+                    // 所属行业
                     var aab022 = codeMappers.Where(c => item["ictItemCode"].ToString().ToUpper().
                     Equals(c.localCodeValue)).FirstOrDefault();
                     if (aab022 == null)
@@ -118,7 +119,7 @@ namespace PullToScxtpt
                     {
                         companyInfo.aab022= aab022.codeValue.ToString();
                     }
-
+                    // 经济类型
                     var aab020 = codeMappers.Where(c => item["icnItemCode"].ToString().ToUpper().
                     Equals(c.localCodeValue)).Where(c => c.codeType.Equals("AAB020")).FirstOrDefault();
                     if (aab020 == null)
@@ -129,7 +130,7 @@ namespace PullToScxtpt
                     {
                         companyInfo.aab020 = aab020.codeValue.ToString();
                     }
-                    //等级时间
+                    //登记时间
                     var aae036 = item["SetUpDate"].ToString();
                        if (string.IsNullOrEmpty(aae036))
                     {

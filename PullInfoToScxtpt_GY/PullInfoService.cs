@@ -35,7 +35,8 @@ namespace PullInfoToScxtpt_GY
                 Thread.Sleep(1000 * 10);
                 _log.Info("PullInfoService Started");
                 //  sender.InserCompanyInfo();
-                sender.InserPersonResume();
+                //sender.InserPersonResume();
+                sender.InserPersonInfo();
             }
             catch (Exception ex)
             {

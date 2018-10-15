@@ -31,17 +31,17 @@ namespace PullToScxtpt
                                 pbi.Mobile ,
                                 pbi.Height,
                                 ic.name
-                        FROM    PersonBaseInfo pbi
-                                JOIN ItemNation nat ON nat.ID = pbi.NationID
-                                JOIN ItemPoliticalStatus ps ON ps.ID = pbi.PoliticalStatusID
-                                JOIN dbo.PersonResumes res ON res.InfoID = pbi.Id
+                           FROM    PersonBaseInfo pbi
+                                JOIN dbo.ItemDetail nat ON nat.ID = pbi.NationID
+                                JOIN ItemDetail ps ON ps.ID = pbi.PoliticalStatusID
+                                JOIN dbo.PersonResume res ON res.InfoID = pbi.Id
                                 JOIN dbo.PersonWorkExperience we ON we.ResumeID = res.Id
                                 JOIN dbo.PersonEducationAndTraining eat ON eat.ResumeID = res.Id
-                                JOIN dbo.ItemDegree deg ON eat.HighestDegreeID = deg.ID
+                                JOIN dbo.ItemDetail deg ON eat.HighestDegreeID = deg.ID
                                 JOIN (SELECT   c1.ID ,
                                                 c2.ItemName + c1.ItemName name
-                                       FROM     dbo.ItemCities c1 ,
-                                                dbo.ItemCities c2
+                                       FROM     dbo.ItemDetail c1 ,
+                                                dbo.ItemDetail c2
                                        WHERE    c1.ParentID = CONVERT(VARCHAR(50),c2.ID))ic
                                        ON ic.id=pbi.PermanentResidenceID";
             DataTable personTable = SqlHelper.ExecuteDataTable(cmdText, new SqlParameter("@param", DBNull.Value));
