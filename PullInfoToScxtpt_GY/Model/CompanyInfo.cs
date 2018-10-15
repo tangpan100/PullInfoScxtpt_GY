@@ -109,5 +109,6 @@ namespace PullToScxtpt
         /// 数据来源 不用填写
         /// </summary>
         public string yae100 { get; set; }
+       
     }
 }

@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -90,12 +91,14 @@ namespace PullToScxtpt.Service
 
                         acc217 = item["Years"].ToString(),
 
-                        //必填项 
+                      
                         //必填项 
                         //是否默认简历（0：默认，1：非默认）
                         acc203 = "0",
                         //登记日期
                         aae043 = item["UpdateTime"].ToString(),
+                        //更新时间
+                        aae044 = item["UpdateTime"].ToString(),
                         yae100 = "广元人才中心",
                         //登记时间
                         aae036 = item["UpdateTime"].ToString(),
@@ -113,7 +116,7 @@ namespace PullToScxtpt.Service
                     }
                     else
                     {
-                        PersonResume.aca111 = cm.typeCode;
+                        PersonResume.aca111 = cm.codeValue;
                     }
                     resumeInfolist.Add(PersonResume);
                 }
@@ -121,8 +124,14 @@ namespace PullToScxtpt.Service
 
             }
 
-            List<string> ylist = YetInsertInfolist.Select(y => y.number).ToList();
-            List<PersonResume> personResumes = resumeInfolist.Where(r => !ylist.Any(y => y == r.acc200)).ToList();
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy/MM/dd";
+            //需要推送的信息 过滤：未插入，插入但更新时间大于推送时间
+            
+            List<PersonResume> personResumes1 = resumeInfolist.Where(r => !YetInsertInfolist.Any(y => y.number == r.acc200)).ToList();
+            List<PersonResume> personResumes2 = resumeInfolist.Where(r => YetInsertInfolist.Any(y => y.number == r.acc200 && Convert.ToDateTime(y.updateTime, dtFormat)
+            < Convert.ToDateTime(r.aae044, dtFormat))).ToList();
+            List<PersonResume>  personResumes = personResumes1.Union(personResumes2).ToList<PersonResume>();
             return personResumes;
         }
     }

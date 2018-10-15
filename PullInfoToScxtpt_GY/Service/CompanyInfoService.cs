@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Data;
 using PullToScxtpt.Model;
+using System.Globalization;
 
 namespace PullToScxtpt
 {
@@ -21,6 +22,8 @@ namespace PullToScxtpt
                                 ict.ID ictItemCode,
                                 cb.SiteUrl,
                                 cb.Postalcode,
+                                ca.AgentName,
+                                CONVERT(varchar(100),  cb.UpdateTime, 20)UpdateTime ,
                                 substring(cb.[Address],0,10)cbAddress,
                                 cb.ContactOne,
                                 cb.ContactOneMobile,
@@ -34,10 +37,11 @@ namespace PullToScxtpt
                                 CONVERT(varchar(100),  cl.InspectionDate, 20)InspectionDate ,
                                 cl.[Address] clAddress
                                
-                           FROM CompanyBaseInfo cb join CompanyLicence cl on cb.Id = cl.CompanyID
-                        JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
-                        JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
-                        JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
+                           FROM CompanyBaseInfo cb left join CompanyLicence cl on cb.Id = cl.CompanyID
+                       left JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
+                       left JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
+                       left JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
+                       left JOIN dbo.CompanyAgent ca ON ca.CompanyID=cb.Id
                         WHERE cb.IsAudit=1";
             DataTable companyInfoTable = SqlHelper.ExecuteDataTable(comText, new SqlParameter("@IsAudit",1));
             List<CodeMapper> codeMappers = SqlHelper.QueryCodeMapper();
@@ -86,7 +90,7 @@ namespace PullToScxtpt
                       
                         aab049 = item["RegisteredCapital"].ToString(),
                         
-                        aae396 = item["InspectionDate"].ToString(),
+                        aae396 = item["UpdateTime"].ToString(),
                         
                         aae022 = "510800000000",
                         //aab998 = item["Nsrsbm"].ToString(),
@@ -112,7 +116,7 @@ namespace PullToScxtpt
                     Equals(c.localCodeValue)).FirstOrDefault();
                     if (aab022 == null)
                     {
-                        companyInfo.aab022 = "0100";
+                        companyInfo.aab022 = "0800";
 
                     }
                     else
@@ -159,7 +163,7 @@ namespace PullToScxtpt
                     companyInfo.aae017 = item["IssuingOrgan"].ToString();
                     if (string.IsNullOrEmpty(companyInfo.aae017))
                     {
-                        companyInfo.aae017 = "该字段为空";
+                        companyInfo.aae017 = "广元市人才服务中心";
                     }
                     else
                     {
@@ -170,17 +174,17 @@ namespace PullToScxtpt
                     companyInfo.aae004 = item["ContactOne"].ToString();
                     if (string.IsNullOrEmpty(companyInfo.aae004))
                     {
-                        companyInfo.aae004 = "该字段为空";
+                        companyInfo.aae004 = item["AgentName"].ToString();
                     }
                     else
                     {
                         companyInfo.aae004 = item["ContactOne"].ToString();
                     }
-                    //
+                    //联系人地址
                     companyInfo.aae006 = item["cbAddress"].ToString();
                     if (string.IsNullOrEmpty(companyInfo.aae006))
                     {
-                        companyInfo.aae006 = "该字段为空";
+                        companyInfo.aae006 = "广元市";
                     }
                     else
                     {
@@ -189,8 +193,14 @@ namespace PullToScxtpt
                     companyInfolist.Add(companyInfo); 
                 }
             }
-            List<string> ylist = YetInsertInfolist.Select(y => y.number).ToList();
-            List<CompanyInfo> companyInfos = companyInfolist.Where(r => !ylist.Any(y => y == r.aab001)).ToList();
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+            dtFormat.ShortDatePattern = "yyyy/MM/dd";
+            //需要推送的信息 过滤：未插入，插入但更新时间大于推送时间
+         
+            List<CompanyInfo> companyInfos1 = companyInfolist.Where(r => !YetInsertInfolist.Any(y => y.number == r.aab001)).ToList();
+            List<CompanyInfo> companyInfos2 = companyInfolist.Where(r => YetInsertInfolist.Any(y => y.number == r.aab001 && Convert.ToDateTime(y.updateTime, dtFormat)
+            < Convert.ToDateTime(r.aae396, dtFormat))).ToList();
+            List<CompanyInfo> companyInfos = companyInfos1.Union(companyInfos2).ToList<CompanyInfo>();
             return companyInfos;
         }
     }

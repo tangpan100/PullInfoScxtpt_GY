@@ -7,6 +7,7 @@ using System.Linq;
 using System.ServiceProcess;
 using System.Text;
 using System.Threading;
+using PullInfoToScxtpt_GY.Helper;
 using PullToScxtpt;
 using PullToScxtpt.Model;
 using Topshelf;
@@ -17,7 +18,7 @@ namespace PullInfoToScxtpt_GY
 {
     partial class PullInfoService : ServiceControl
     {
-        static readonly LogWriter _log = HostLogger.Get<PullInfoService>();
+     
         private static object LockObject = new Object();
         // 检查更新锁
         private static int CheckUpDateLock = 0;
@@ -32,15 +33,18 @@ namespace PullInfoToScxtpt_GY
         {
             try
             {
-                Thread.Sleep(1000 * 10);
-                _log.Info("PullInfoService Started");
-                //  sender.InserCompanyInfo();
+                //  Thread.Sleep(1000 * 10);
+
+                LogHelper.GetLog(this).Info(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")));
+                LogHelper.GetLog(this).Error("测试出错！！！", new Exception("dfsafdsafddsafdsa"));
+
                 //sender.InserPersonResume();
                 sender.InserPersonInfo();
+               // sender.InserCompanyInfo();
             }
             catch (Exception ex)
             {
-                _log.Info(ex.Message);
+                
             }
             return true;
         }
@@ -49,12 +53,12 @@ namespace PullInfoToScxtpt_GY
         {
             try
             {
-                _log.Info("PullInfoService Started");
+             //   _log.Info("PullInfoService Started");
 
             }
             catch (Exception ex)
             {
-                _log.Info(ex.Message);
+             //   _log.Info(ex.Message);
             }
             return true;
         }

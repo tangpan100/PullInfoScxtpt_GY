@@ -56,7 +56,9 @@ namespace PullToScxtpt.Model
         public string ycb213 { get; set; }
         //工作地点代码
         public string acb215 { get; set; }
-
+        //更新时间
+        public string aae044 { get; set; }
+        
     }
 
 }

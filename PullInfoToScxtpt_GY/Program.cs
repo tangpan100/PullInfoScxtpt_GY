@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Timers;
@@ -12,6 +14,10 @@ namespace PullInfoToScxtpt_GY
     {
         static void Main(string[] args)
         {
+            string assemblyFilePath = Assembly.GetExecutingAssembly().Location;
+            string assemblyDirPath = Path.GetDirectoryName(assemblyFilePath);
+            string configFilePath = assemblyDirPath + "\\log4net.config";
+            log4net.Config.XmlConfigurator.Configure(new FileInfo(configFilePath));
             HostFactory.Run(x =>                                 
             {
          
