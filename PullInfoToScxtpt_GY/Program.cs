@@ -21,7 +21,7 @@ namespace PullInfoToScxtpt_GY
             HostFactory.Run(x =>                                 
             {
          
-                x.UseLog4Net("log4net.config");
+             //   x.UseLog4Net("log4net.config");
                 x.RunAsLocalSystem();
                 x.Service(settings => new PullInfoService());
              

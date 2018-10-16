@@ -151,17 +151,12 @@ namespace PullToScxtpt
                     }
                     personInfo.aac002 = item["IDCardNo"].ToString();
                       //身份证
-                    if (string.IsNullOrEmpty(personInfo.aac002))
-                    {
-                        personInfo.aac002 = "510403198901022115";
-                    }
-                    else
-                    {
-                        personInfo.aac002 = item["IDCardNo"].ToString().ToLower();
-                    }
+                   
+                    personInfo.aac002 = item["IDCardNo"].ToString().ToLower();
+                    
                     personInfo.aae011 = item["PersonName"].ToString();
                     //经办人
-                    if (string.IsNullOrEmpty(personInfo.aac002))
+                    if (string.IsNullOrEmpty(personInfo.aae011))
                     {
                         personInfo.aae011 = "广元市人才服务中心";
                     }
