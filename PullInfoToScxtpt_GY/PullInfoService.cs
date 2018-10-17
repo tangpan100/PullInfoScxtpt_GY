@@ -22,40 +22,28 @@ namespace PullInfoToScxtpt_GY
         private static object LockObject = new Object();
         // 检查更新锁
         private static int CheckUpDateLock = 0;
-        TaskTimer timer1;  //计时器
-        TaskTimer timer2;  //计时器
-        TaskTimer timer3;  //计时器
-        Sender sender = new Sender();
-
     
+        private static System.Threading.Timer timer1 = null;  //计时器
+        private static System.Threading.Timer timer2;  //计时器
+        private static System.Threading.Timer timer3;  //计时器
+        private int dueTime = 1000*2;//(单位毫秒)
+        private int period = 1000 * 60 * 60*2;//(单位毫秒)
+        private static Sender sender = new Sender();
 
         public bool Start(HostControl hostControl)
         {
             try
             {
 
-                LogHelper.GetLog(this).Info(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) + "====pullInfoService Start");
-
-                timer1 = new TaskTimer(sender);
-                timer1.Interval = 72;  //设置计时器事件间隔执行时间 2小时
-                timer1.Elapsed += new System.Timers.ElapsedEventHandler(TMStart1_Elapsed);
-                timer1.Enabled = true;
-
-                timer2 = new TaskTimer(sender);
-                timer2.Interval = 72;  //设置计时器事件间隔执行时间
-                timer2.Elapsed += new System.Timers.ElapsedEventHandler(TMStart2_Elapsed);
-                timer2.Enabled = true;
-
-                //timer3 = new TaskTimer(sender);
-                //timer3.Interval = 72;  //设置计时器事件间隔执行时间
-                //timer3.Elapsed += new System.Timers.ElapsedEventHandler(TMStart3_Elapsed);
-                //timer3.Enabled = true;
-
-                // LogHelper.GetLog(this).Error("测试出错！！！", new Exception("dfsafdsafddsafdsa"));
-
-                //sender.InserPersonResume();
                 //sender.InserPersonInfo();
-               sender.InserCompanyInfo();
+                //sender.InserCompanyInfo();
+                //sender.InserPersonResume();
+                timer1 = new System.Threading.Timer(TMStart1_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+                timer1.Change(dueTime, period);
+                timer2 = new System.Threading.Timer(TMStart2_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+                timer2.Change(dueTime, period);
+                timer3 = new System.Threading.Timer(TMStart3_Elapsed, null, Timeout.Infinite, Timeout.Infinite);
+                timer3.Change(dueTime, period);
             }
             catch (Exception ex)
             {
@@ -66,94 +54,98 @@ namespace PullInfoToScxtpt_GY
 
         public bool Stop(HostControl hostControl)
         {
+            return true;
+        }
+
+        private void TMStart1_Elapsed(object state)
+        {
+            // 加锁检查更新锁
+            //lock (LockObject)
+            //{
+            //    if (CheckUpDateLock == 0) CheckUpDateLock = 1;
+            //    else return;
+            //}
+
+
+
+
             try
             {
-                LogHelper.GetLog(this).Info(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) +"====pullInfoService Stop");
+                sender.InserCompanyInfo();
+            }
+            catch (Exception ex)
+            {
+
+                LogHelper.GetLog(this).Error(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) + "异常：插入公司信息" + ex.Message);
+            }
+            //// 解锁更新检查锁
+            //lock (LockObject)
+            //{
+            //    CheckUpDateLock = 0;
+            //}
+
+
+        }
+
+        private void TMStart2_Elapsed(object state)
+        {
+            //// 加锁检查更新锁
+            //lock (LockObject)
+            //{
+            //    if (CheckUpDateLock == 0) CheckUpDateLock = 1;
+            //    else return;
+            //}
+
+
+            try
+            {
+                sender.InserPersonInfo();
 
             }
             catch (Exception ex)
             {
-                LogHelper.GetLog(this).Info(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) + "异常：" + ex.Message);
+
+                LogHelper.GetLog(this).Error(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) + "异常：插入个人信息" + ex.Message);
             }
-            return true;
+
+
+            //// 解锁更新检查锁
+            //lock (LockObject)
+            //{
+            //    CheckUpDateLock = 0;
+            //}
+
+
         }
-
-
-        private void TMStart1_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
+        private void TMStart3_Elapsed(object state)
         {
+            //// 加锁检查更新锁
+            //lock (LockObject)
+            //{
+            //    if (CheckUpDateLock == 0) CheckUpDateLock = 1;
+            //    else return;
+            //}
 
-            //执行SQL语句或其他操作
-            // 加锁检查更新锁
-            lock (LockObject)
+
+
+            try
             {
-                if (CheckUpDateLock == 0) CheckUpDateLock = 1;
-                else return;
+
+                sender.InserPersonResume();
             }
-            TaskTimer timer = (TaskTimer)sender;
-            timer.sender.InserCompanyInfo();
-            //More code goes here.
-            //具体实现功能的方法
-            // 解锁更新检查锁
-            lock (LockObject)
+            catch (Exception ex)
             {
-                CheckUpDateLock = 0;
+
+                LogHelper.GetLog(this).Error(string.Format("DATE： {0}", DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")) + "异常：插入个人简历信息" + ex.Message);
             }
 
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("C:\\" + 1 + "log.txt", true))
-            {
-                sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "Start.");
-            }
+            //// 解锁更新检查锁
+            //lock (LockObject)
+            //{
+            //    CheckUpDateLock = 0;
+            //}
         }
 
-        private void TMStart2_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-
-            //执行SQL语句或其他操作
-            //执行SQL语句或其他操作
-            // 加锁检查更新锁
-            lock (LockObject)
-            {
-                if (CheckUpDateLock == 0) CheckUpDateLock = 1;
-                else return;
-            }
-            TaskTimer timer = (TaskTimer)sender;
-            timer.sender.InserPersonResume();
-            //More code goes here.
-            //具体实现功能的方法
-            // 解锁更新检查锁
-            lock (LockObject)
-            {
-                CheckUpDateLock = 0;
-            }
-
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("C:\\" + 2 + "log.txt", true))
-            {
-                sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "Start.");
-            }
-        }
-        private void TMStart3_Elapsed(object sender, System.Timers.ElapsedEventArgs e)
-        {
-
-            //执行SQL语句或其他操作
-            lock (LockObject)
-            {
-                if (CheckUpDateLock == 0) CheckUpDateLock = 1;
-                else return;
-            }
-            TaskTimer timer = (TaskTimer)sender;
-            // timer.sender.InserPersonInfo();
-            //More code goes here.
-            //具体实现功能的方法
-            // 解锁更新检查锁
-            lock (LockObject)
-            {
-                CheckUpDateLock = 0;
-            }
-            using (System.IO.StreamWriter sw = new System.IO.StreamWriter("C:\\" + 3 + "log.txt", true))
-            {
-                sw.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss ") + "Start.");
-            }
-        }
 
     }
 }

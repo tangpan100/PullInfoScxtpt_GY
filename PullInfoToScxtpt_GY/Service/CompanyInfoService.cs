@@ -15,7 +15,7 @@ namespace PullToScxtpt
        
         public List<CompanyInfo> QueryCompanyInfo()
         {
-            string comText = @"SELECT top 500 cb.Number,
+            string comText = @"SELECT left(cb.AccountID,18)AccountID ,
                                 cb.FullName,
                                 icn.ID icnItemCode,
                                 ics.ID icsItemCode,  
@@ -37,11 +37,11 @@ namespace PullToScxtpt
                                 CONVERT(varchar(100),  cl.InspectionDate, 20)InspectionDate ,
                                 cl.[Address] clAddress
                                
-                           FROM CompanyBaseInfo cb left join CompanyLicence cl on cb.Id = cl.CompanyID
-                       left JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
-                       left JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
-                       left JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
-                       left JOIN dbo.CompanyAgent ca ON ca.CompanyID=cb.Id
+                           FROM CompanyBaseInfo cb  join CompanyLicence cl on cb.Id = cl.CompanyID
+                        JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
+                        JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
+                        JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
+                        JOIN dbo.CompanyAgent ca ON ca.CompanyID=cb.Id
                         WHERE cb.IsAudit=1";
             DataTable companyInfoTable = SqlHelper.ExecuteDataTable(comText, new SqlParameter("@IsAudit",1));
             List<CodeMapper> codeMappers = SqlHelper.QueryCodeMapper();
@@ -76,7 +76,7 @@ namespace PullToScxtpt
                     CompanyInfo companyInfo = new CompanyInfo()
 
                     {
-                        aab001 = item["Number"].ToString(),
+                        aab001 = item["AccountID"].ToString(),
                         aab004 = item["FullName"].ToString(),
                        // aae392 = item["SiteUrl"].ToString(),
                        // aae007 = item["Postalcode"].ToString(),
@@ -113,7 +113,7 @@ namespace PullToScxtpt
                     }
                     // 所属行业
                     var aab022 = codeMappers.Where(c => item["ictItemCode"].ToString().ToUpper().
-                    Equals(c.localCodeValue)).FirstOrDefault();
+                    Equals(c.localCodeValue)).Where(c => c.codeType.Equals("AAB022")).FirstOrDefault();
                     if (aab022 == null)
                     {
                         companyInfo.aab022 = "0800";

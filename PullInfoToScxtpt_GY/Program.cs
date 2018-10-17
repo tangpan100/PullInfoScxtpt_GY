@@ -27,7 +27,7 @@ namespace PullInfoToScxtpt_GY
              
 
                 x.SetDescription("推送人才网站信息到四川协同平台");        
-                x.SetDisplayName("123");                       
+                x.SetDisplayName("PullInfoToScxtpt_GY");                       
                 x.SetServiceName("PullInfoToScxtpt_GY");                       
             });                                                  
         }

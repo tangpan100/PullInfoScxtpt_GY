@@ -15,7 +15,7 @@ namespace PullToScxtpt
         public List<PersonInfo> QueryPersonInfo()
         {
           
-            string cmdText = @"SELECT LEFT(pbi.AccountID,20)AccountID ,
+            string cmdText = @"SELECT LEFT(pbi.AccountID,18)AccountID ,
                                 pbi.PersonName ,
                                 pbi.IDCardNo ,
                                 Sex= case when pbi.Sex='男' then 1 else 2 end ,
@@ -61,7 +61,7 @@ namespace PullToScxtpt
                     YetInsertInfo yetInsertInfo = new YetInsertInfo()
                     {
                         number = item["number"].ToString(),
-                        type = item["number"].ToString(),
+                        type = item["type"].ToString(),
                         updateTime = item["updateTime"].ToString()
 
                     };
