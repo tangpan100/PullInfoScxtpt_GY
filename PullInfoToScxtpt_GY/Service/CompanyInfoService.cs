@@ -15,34 +15,40 @@ namespace PullToScxtpt
        
         public List<CompanyInfo> QueryCompanyInfo()
         {
-            string comText = @"SELECT left(cb.AccountID,18)AccountID ,
-                                cb.FullName,
-                                icn.ID icnItemCode,
-                                ics.ID icsItemCode,  
-                                ict.ID ictItemCode,
-                                cb.SiteUrl,
-                                cb.Postalcode,
-                                ca.AgentName,
-                                CONVERT(varchar(100),  cb.UpdateTime, 20)UpdateTime ,
-                                substring(cb.[Address],0,10)cbAddress,
-                                cb.ContactOne,
-                                cb.ContactOneMobile,
-                                cb.ContactOnePhone,
-                                cb.ContactOneEmail,
-                                cb.Introduction,
-                                cl.PersonName,
-                                cl.IssuingOrgan,
-                                cl.RegisteredCapital,
-                                CONVERT(varchar(100),  cl.SetUpDate, 20)SetUpDate ,
-                                CONVERT(varchar(100),  cl.InspectionDate, 20)InspectionDate ,
-                                cl.[Address] clAddress
-                               
-                           FROM CompanyBaseInfo cb  join CompanyLicence cl on cb.Id = cl.CompanyID
-                        JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
-                        JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
-                        JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
-                        JOIN dbo.CompanyAgent ca ON ca.CompanyID=cb.Id
-                        WHERE cb.IsAudit=1";
+            string comText = @"SELECT  LEFT(cb.AccountID, 18) AccountID ,
+                                        cb.FullName ,
+                                        icn.ID icnItemCode ,
+                                        ics.ID icsItemCode ,
+                                        ict.ID ictItemCode ,
+                                        cb.SiteUrl ,
+                                        cb.Postalcode ,
+                                        ca.AgentName ,
+                                        CONVERT(VARCHAR(100), cb.UpdateTime, 20) UpdateTime ,
+                                        SUBSTRING(cb.[Address], 0, 10) cbAddress ,
+                                        cb.ContactOne ,
+                                        cb.ContactOneMobile ,
+                                        cb.ContactOnePhone ,
+                                        cb.ContactOneEmail ,
+                                        cb.Introduction ,
+                                        cl.PersonName ,
+                                        cl.IssuingOrgan ,
+                                        cl.RegisteredCapital ,
+                                        CONVERT(VARCHAR(100), cl.SetUpDate, 20) SetUpDate ,
+                                        CONVERT(VARCHAR(100), cl.InspectionDate, 20) InspectionDate ,
+                                        cl.[Address] clAddress
+                                FROM    CompanyBaseInfo cb
+                                        JOIN CompanyLicence cl ON cb.Id = cl.CompanyID
+                                        JOIN dbo.ItemDetail icn ON icn.ID = cb.NatureID
+                                        JOIN dbo.ItemDetail ics ON ics.ID = cb.ScaleID
+                                        JOIN dbo.ItemDetail ict ON ict.ID = cb.TradeID
+                                        JOIN ( SELECT   *
+                                               FROM     ( SELECT    * ,
+                                                                    ROW_NUMBER() OVER ( PARTITION BY CompanyID ORDER BY CompanyID DESC ) AS rw
+                                                          FROM      dbo.CompanyAgent
+                                                        ) AS t1
+                                               WHERE    rw = 1
+                                             ) ca ON ca.CompanyID = cb.Id
+                                WHERE   cb.IsAudit = 1;";
             DataTable companyInfoTable = SqlHelper.ExecuteDataTable(comText, new SqlParameter("@IsAudit",1));
             List<CodeMapper> codeMappers = SqlHelper.QueryCodeMapper();
             string cmdText2 = "select * from PullInfoRecord where type='企业信息'";
